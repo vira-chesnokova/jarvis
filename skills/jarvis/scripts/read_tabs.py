@@ -22,11 +22,17 @@ JUNK_PREFIXES = (
     "brave://", "arc://", "vivaldi://", "file:///Applications",
 )
 
+# The separator is built OUTSIDE the tell block on purpose. Inside
+# `tell application "Google Chrome"`, the word `tab` resolves to Chrome's own
+# tab class rather than the tab character, so the script emits the literal
+# text "tab" as its delimiter and every row becomes unparseable.
 SCRIPT = '''
+set sep to (ASCII character 9)
+set eol to (ASCII character 10)
 if application "{app}" is running then
 	tell application "{app}"
 		set wc to (count of windows)
-		set out to "#WINDOWS" & tab & wc & linefeed
+		set out to "#WINDOWS" & sep & wc & eol
 		set wi to 0
 		repeat with w in windows
 			set wi to wi + 1
@@ -34,9 +40,9 @@ if application "{app}" is running then
 			repeat with t in tabs of w
 				set ti to ti + 1
 				try
-					set out to out & wi & tab & ti & tab & (URL of t) & tab & (title of t) & linefeed
+					set out to out & wi & sep & ti & sep & (URL of t) & sep & (title of t) & eol
 				on error errMsg
-					set out to out & "#ERROR" & tab & wi & tab & ti & tab & errMsg & linefeed
+					set out to out & "#ERROR" & sep & wi & sep & ti & sep & errMsg & eol
 				end try
 			end repeat
 		end repeat

@@ -18,48 +18,97 @@ OUT = os.path.join(HOME, ".jarvis", "dashboard.html")
 
 CSS = """
 :root {
-  --bg: #faf9f7; --surface: #ffffff; --line: #e8e4dd;
-  --ink: #23211e; --ink-soft: #6b665e; --ink-faint: #9c968c;
-  --accent: #3d6b5c; --accent-soft: #eef3f1; --warm: #b5813f;
-  --radius: 10px;
+  --bg: #f7f5f1; --surface: #ffffff; --sunk: #f1eee8;
+  --line: #e4dfd6; --line-soft: #efebe3;
+  --ink: #22201d; --ink-soft: #6a655d; --ink-faint: #9a948a;
+  --accent: #3d6b5c; --accent-soft: #eaf1ee; --warm: #b5813f;
+  --radius: 14px;
+  --shadow: 0 1px 2px rgba(40,32,20,.04), 0 8px 20px -14px rgba(40,32,20,.18);
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #16151a; --surface: #1d1c22; --line: #2e2c35;
-    --ink: #e8e5e0; --ink-soft: #a09b94; --ink-faint: #6f6a63;
-    --accent: #7db8a3; --accent-soft: #212b28; --warm: #d5a463;
+    --bg: #141317; --surface: #1e1d23; --sunk: #191820;
+    --line: #2d2b34; --line-soft: #26242c;
+    --ink: #e9e6e1; --ink-soft: #a5a099; --ink-faint: #6f6a63;
+    --accent: #7db8a3; --accent-soft: #1f2a27; --warm: #d5a463;
+    --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 20px -14px rgba(0,0,0,.6);
   }
 }
 * { box-sizing: border-box; }
 body {
   margin: 0; background: var(--bg); color: var(--ink);
-  font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+  font: 15.5px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
-.wrap { max-width: 760px; margin: 0 auto; padding: 56px 24px 120px; }
+.wrap { max-width: 1120px; margin: 0 auto; padding: 44px 28px 88px; }
 
-header { margin-bottom: 48px; }
+/* --- header ----------------------------------------------------------- */
+header { margin-bottom: 30px; }
 .brandrow { display: flex; align-items: center; gap: 14px; }
 h1 {
-  font-size: 15px; font-weight: 600; letter-spacing: .14em;
+  font-size: 13px; font-weight: 700; letter-spacing: .16em;
   text-transform: uppercase; color: var(--ink-faint); margin: 0; flex: 1;
 }
-.summary { font-size: 24px; line-height: 1.4; margin: 12px 0 0; font-weight: 400; }
-.summary em { font-style: normal; color: var(--accent); font-weight: 600; }
-.stamp { margin: 12px 0 0; font-size: 13px; color: var(--ink-faint); }
+.summary { font-size: 27px; line-height: 1.25; margin: 14px 0 0; font-weight: 500; letter-spacing: -.02em; }
+.summary em { font-style: normal; color: var(--accent); font-weight: 700; }
+.stamp { margin: 8px 0 0; font-size: 12.5px; color: var(--ink-faint); }
 
+/* --- section labels: a rule that carves the page into bands ----------- */
+.section-label {
+  display: flex; align-items: center; gap: 14px;
+  font-size: 11px; font-weight: 700; letter-spacing: .14em; text-transform: uppercase;
+  color: var(--ink-faint); margin: 40px 0 14px;
+}
+.section-label::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+
+/* --- the grid: cards sit side by side instead of stacking forever ----- */
+.grid { display: grid; gap: 14px; align-items: start;
+        grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); }
+.grid.dense { gap: 10px; grid-template-columns: repeat(auto-fill, minmax(272px, 1fr)); }
+
+/* --- cards ------------------------------------------------------------ */
 .task {
   background: var(--surface); border: 1px solid var(--line);
-  border-radius: var(--radius); padding: 20px 22px; margin-bottom: 12px;
+  border-radius: var(--radius); padding: 18px 20px 16px;
+  display: flex; flex-direction: column;
+  box-shadow: var(--shadow); transition: border-color .14s ease;
 }
-.task-head { display: flex; align-items: baseline; gap: 12px; }
-.task h2 { font-size: 17px; font-weight: 600; margin: 0; flex: 1; line-height: 1.35; }
-.note { margin: 8px 0 0; font-size: 14px; color: var(--ink-soft); }
+.task:hover { border-color: #d5cec2; }
+@media (prefers-color-scheme: dark) { .task:hover { border-color: #3b3945; } }
+.task-head { display: flex; align-items: flex-start; gap: 10px; }
+.task h2 {
+  font-size: 16px; font-weight: 650; margin: 0; flex: 1;
+  line-height: 1.3; letter-spacing: -.011em;
+}
+.chip {
+  font-size: 10.5px; font-weight: 700; letter-spacing: .05em; white-space: nowrap;
+  padding: 4px 9px; border-radius: 999px;
+  background: var(--sunk); color: var(--ink-faint); margin-top: 1px;
+}
+.chip.live { background: var(--accent-soft); color: var(--accent); }
+.note { margin: 7px 0 0; font-size: 13.5px; color: var(--ink-soft); line-height: 1.45; }
+.note[contenteditable] { border-radius: 5px; padding: 1px 3px; margin-left: -3px; }
+.note[contenteditable]:empty::before { content: "add a note"; color: var(--ink-faint); opacity: .6; }
+.note[contenteditable]:focus { outline: none; background: var(--sunk); }
 
-details { margin-top: 14px; }
+/* --- resume block: the reason the page gets opened at all ------------- */
+.resume {
+  margin-top: 13px; padding: 11px 13px 10px;
+  background: var(--accent-soft); border-radius: 9px;
+}
+.resume-label {
+  margin: 0 0 4px; font-size: 10px; font-weight: 700; letter-spacing: .13em;
+  text-transform: uppercase; color: var(--accent);
+}
+.resume ul.links li { border-top-color: rgba(128,128,128,.16); }
+.resume ul.links a { font-weight: 550; }
+
+/* --- collapsible link lists ------------------------------------------ */
+details { margin-top: 12px; }
 details > summary {
-  cursor: pointer; font-size: 13px; color: var(--accent); list-style: none;
-  display: inline-flex; align-items: center; gap: 6px; padding: 3px 0; user-select: none;
+  cursor: pointer; font-size: 12.5px; font-weight: 550; color: var(--accent);
+  list-style: none; display: inline-flex; align-items: center; gap: 6px;
+  padding: 2px 0; user-select: none;
 }
 details > summary::-webkit-details-marker { display: none; }
 details > summary::before {
@@ -69,73 +118,77 @@ details > summary::before {
 details[open] > summary::before { transform: rotate(90deg); }
 details > summary:hover { text-decoration: underline; }
 
-ul.links { list-style: none; margin: 12px 0 0; padding: 0; }
-ul.links li { padding: 11px 0; border-top: 1px solid var(--line); }
-ul.links li:first-child { border-top: none; padding-top: 4px; }
+ul.links { list-style: none; margin: 8px 0 0; padding: 0; }
+ul.links li { padding: 9px 0; border-top: 1px solid var(--line-soft); }
+ul.links li:first-child { border-top: none; padding-top: 3px; }
 ul.links a {
-  color: var(--ink); text-decoration: none; font-size: 14.5px;
-  display: block; line-height: 1.45;
+  color: var(--ink); text-decoration: none; font-size: 13.5px;
+  display: block; line-height: 1.4; font-weight: 500;
 }
 ul.links a:hover { color: var(--accent); text-decoration: underline; }
-.why { margin: 3px 0 0; font-size: 13px; color: var(--ink-soft); }
-.host { font-size: 12px; color: var(--ink-faint); margin: 2px 0 0; }
+.why { margin: 3px 0 0; font-size: 12.5px; color: var(--ink-soft); line-height: 1.4; }
+.host { font-size: 11.5px; color: var(--ink-faint); margin: 2px 0 0; }
 .hedge { color: var(--warm); font-style: italic; }
 
-.resume { margin-top: 14px; padding: 12px 16px; background: var(--accent-soft); border-radius: 8px; }
-.resume-label {
-  margin: 0 0 6px; font-size: 11px; font-weight: 600; letter-spacing: .1em;
-  text-transform: uppercase; color: var(--accent);
-}
-.resume ul.links li { border-top-color: rgba(128,128,128,.18); }
-.resume ul.links a { font-weight: 500; }
-
-/* --- controls (served mode only) --- */
+/* --- controls: pinned to the bottom so cards in a row line up --------- */
 .btn {
-  font: inherit; font-size: 13px; line-height: 1;
+  font: inherit; font-size: 12.5px; line-height: 1; font-weight: 500;
   padding: 7px 13px; border-radius: 999px; cursor: pointer;
   border: 1px solid var(--line); background: var(--surface); color: var(--ink-soft);
   transition: all .12s ease;
 }
 .btn:hover { border-color: var(--accent); color: var(--accent); }
-.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 500; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
 .btn.primary:hover { filter: brightness(1.08); color: #fff; }
-.btn.ghost { border-color: transparent; padding: 5px 8px; color: var(--ink-faint); font-size: 12px; }
+.btn.ghost { border-color: transparent; padding: 4px 7px; color: var(--ink-faint); font-size: 11.5px; }
 .btn.ghost:hover { color: var(--warm); border-color: transparent; }
-.controls { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
-.link-ctl { display: flex; gap: 6px; align-items: center; margin-top: 6px; }
+.controls { display: flex; gap: 7px; margin-top: auto; padding-top: 14px; flex-wrap: wrap; }
+.link-ctl {
+  display: flex; gap: 6px; align-items: center; margin-top: 6px;
+  opacity: 0; transition: opacity .12s ease;
+}
+ul.links li:hover .link-ctl,
+.link-ctl:focus-within { opacity: 1; }
+@media (hover: none) { .link-ctl { opacity: 1; } }
 .link-ctl select {
-  font: inherit; font-size: 12px; padding: 3px 6px; border-radius: 6px;
+  font: inherit; font-size: 11.5px; padding: 3px 6px; border-radius: 6px;
   border: 1px solid var(--line); background: var(--surface); color: var(--ink-faint);
 }
-.task.quiet .controls { margin-top: 10px; }
 
+/* --- quiet cards: present, but visibly not asking for anything -------- */
 .task.quiet {
-  background: none; border: none; border-bottom: 1px solid var(--line);
-  border-radius: 0; padding: 15px 2px; margin-bottom: 0;
+  background: var(--sunk); border-color: transparent; box-shadow: none;
+  padding: 14px 16px 13px;
 }
-.task.quiet h2 { font-size: 15px; font-weight: 500; color: var(--ink-soft); }
-.task.quiet .note { font-size: 13px; }
-.unsorted { background: none; border: 1px dashed var(--line); }
+.task.quiet:hover { border-color: var(--line); }
+.task.quiet h2 { font-size: 14.5px; font-weight: 600; color: var(--ink-soft); }
+.task.quiet .note { font-size: 12.5px; }
+.task.quiet .controls { padding-top: 12px; }
 
-.section-label {
-  font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase;
-  color: var(--ink-faint); margin: 44px 0 14px;
-}
+.unsorted { background: none; border: 1px dashed var(--line); box-shadow: none; }
+.unsorted:hover { border-color: var(--warm); }
+
 .empty {
   color: var(--ink-soft); font-size: 15px; text-align: center;
-  padding: 48px 24px; border: 1px dashed var(--line); border-radius: var(--radius);
+  padding: 44px 24px; border: 1px dashed var(--line); border-radius: var(--radius);
 }
 footer {
-  margin-top: 64px; padding-top: 20px; border-top: 1px solid var(--line);
+  margin-top: 52px; padding-top: 18px; border-top: 1px solid var(--line);
   font-size: 12.5px; color: var(--ink-faint);
 }
 footer code { font-size: 12px; background: var(--accent-soft); padding: 2px 6px; border-radius: 4px; color: var(--accent); }
 #toast {
   position: fixed; bottom: 26px; left: 50%; transform: translateX(-50%) translateY(20px);
   background: var(--ink); color: var(--bg); padding: 10px 18px; border-radius: 999px;
-  font-size: 13.5px; opacity: 0; pointer-events: none; transition: all .2s ease;
+  font-size: 13.5px; opacity: 0; pointer-events: none; transition: all .2s ease; z-index: 9;
 }
 #toast.on { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+@media (max-width: 640px) {
+  .wrap { padding: 32px 18px 64px; }
+  .summary { font-size: 22px; }
+  .grid, .grid.dense { grid-template-columns: 1fr; }
+}
 """
 
 JS = """
@@ -153,7 +206,16 @@ function toast(msg) {
   el.textContent = msg; el.classList.add('on');
   clearTimeout(tid); tid = setTimeout(() => el.classList.remove('on'), 1900);
 }
+// Chrome blocks http:// -> file:// navigation, so local files are opened by
+// the host instead of by the link. Everything else is a plain link.
 document.addEventListener('click', async (e) => {
+  const a = e.target.closest('a[href^="file:"]');
+  if (a) {
+    e.preventDefault();
+    const r = await api('/api/open', {url: a.getAttribute('href')});
+    toast(r && r.opened ? 'Opening file' : "Couldn't open that file");
+    return;
+  }
   const b = e.target.closest('[data-act]');
   if (!b || b.tagName === 'SELECT') return;
   e.preventDefault();
@@ -191,6 +253,10 @@ def esc(s):
 
 
 def host(url):
+    # A file:// url has no host, but "local file" is the useful thing to show:
+    # it says the link opens something on this machine, not on the web.
+    if url.startswith("file:"):
+        return "local file"
     try:
         h = url.split("//", 1)[-1].split("/", 1)[0]
         return h[4:] if h.startswith("www.") else h
@@ -273,6 +339,15 @@ def task_block(t, quiet=False, options=None):
     else:
         rest_html = ""
 
+    # A chip carries the one number that matters at a glance: how much is
+    # still open in that thread, falling back to how much is filed under it.
+    if resume:
+        chip = f'<span class="chip live">{len(resume)} open</span>'
+    elif links:
+        chip = f'<span class="chip">{len(links)}</span>'
+    else:
+        chip = ""
+
     ctrl = ""
     if interactive:
         parked = t.get("status", "active") != "active"
@@ -290,7 +365,7 @@ def task_block(t, quiet=False, options=None):
     cls = "task quiet" if quiet else "task"
     return (
         f'<article class="{cls}">'
-        f'<div class="task-head"><h2>{esc(t.get("title"))}</h2></div>'
+        f'<div class="task-head"><h2>{esc(t.get("title"))}</h2>{chip}</div>'
         f"{note}{resume_html}{rest_html}{ctrl}</article>"
     )
 
@@ -343,8 +418,12 @@ def render(data, interactive=False):
         "</header><main>",
     ]
 
+    def grid(items, dense=False, quiet=False):
+        cards = "".join(task_block(t, quiet=quiet, options=options) for t in items)
+        return f'<div class="grid{" dense" if dense else ""}">{cards}</div>'
+
     if active:
-        parts += [task_block(t, options=options) for t in active]
+        parts.append(grid(active))
     else:
         parts.append(
             '<p class="empty">No active projects yet. Run <code>/jarvis</code> '
@@ -353,18 +432,18 @@ def render(data, interactive=False):
 
     if watch:
         parts.append('<p class="section-label">Keeping an eye on</p>')
-        parts += [task_block(t, quiet=True, options=options) for t in watch]
+        parts.append(grid(watch, dense=True, quiet=True))
 
     if learning:
         parts.append('<p class="section-label">Learning</p>')
-        parts += [task_block(t, quiet=True, options=options) for t in learning]
+        parts.append(grid(learning, dense=True, quiet=True))
 
     if resting:
         parts.append('<p class="section-label">Parked</p>')
-        inner = "".join(task_block(t, quiet=True, options=options) for t in resting)
         parts.append(
             f'<details><summary>{len(resting)} parked</summary>'
-            f'<div style="margin-top:12px">{inner}</div></details>'
+            f'<div style="margin-top:12px">{grid(resting, dense=True, quiet=True)}'
+            "</div></details>"
         )
 
     if unfiled:

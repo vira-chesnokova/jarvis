@@ -9,6 +9,7 @@ separate "re-render" step — Refresh is the whole story.
 
 Endpoints (all POST, all local):
     /api/resume   {task_id}                -> reopen a task's tabs in Chrome
+    /api/open     {url}                    -> open one stored link (file:// included)
     /api/park     {task_id}                -> toggle active <-> parked
     /api/move     {from, to, url}          -> move a link between tasks
     /api/archive  {task_id, url}           -> retire a link (recoverable)
@@ -46,6 +47,39 @@ def browser():
             return json.load(fh).get("browser_app") or "Google Chrome"
     except (FileNotFoundError, json.JSONDecodeError, AttributeError):
         return "Google Chrome"
+
+def _esc(s):
+    return s.replace("\\", "\\\\").replace('"', '\\"')
+
+
+def open_urls(urls):
+    """Open urls as tabs in the browser. Returns how many were handed over.
+
+    Uses AppleScript rather than `open -a`: macOS `open` exits 0 but silently
+    does nothing when it hands Chrome a file:// url, which would quietly drop
+    every local file from a resume with no error to notice.
+    """
+    urls = [u for u in urls if u]
+    if not urls:
+        return 0
+    items = ", ".join(f'"{_esc(u)}"' for u in urls)
+    script = f'''
+set targets to {{{items}}}
+tell application "{browser()}"
+	activate
+	if (count of windows) is 0 then make new window
+	repeat with u in targets
+		tell front window to make new tab with properties {{URL:u}}
+	end repeat
+end tell
+'''
+    try:
+        p = subprocess.run(["osascript", "-e", script],
+                           capture_output=True, text=True, timeout=30)
+    except (FileNotFoundError, subprocess.TimeoutExpired):
+        return 0
+    return len(urls) if p.returncode == 0 else 0
+
 
 _lock = threading.Lock()
 
@@ -95,9 +129,30 @@ def act_resume(data, body):
     ordered = [l for l in b if l.get("mode") == "editing"] + \
               [l for l in b if l.get("mode") != "editing"]
     urls = [l["url"] for l in ordered[:12] if l.get("url")]
-    if urls:
-        subprocess.Popen(["open", "-a", browser()] + urls)
-    return {"opened": len(urls)}
+    return {"opened": open_urls(urls)}
+
+
+def known_urls(data):
+    """Every url Jarvis is currently holding, wherever it lives."""
+    seen = {l.get("url") for l in data.get("unfiled", [])}
+    seen |= {l.get("url") for l in data.get("archive", [])}
+    for t in data.get("tasks", []):
+        seen |= {l.get("url") for l in t.get("links", [])}
+    return seen
+
+
+def act_open(data, body):
+    """Open one stored link in the browser.
+
+    Chrome refuses to navigate from an http:// page to a file:// url, so a
+    local file can only be reached by asking the host to open it. Restricted
+    to urls already in the store, so a stray page POSTing here cannot open
+    anything Jarvis was not already holding.
+    """
+    url = body.get("url")
+    if not url or url not in known_urls(data):
+        return {"error": "unknown link"}
+    return {"opened": open_urls([url])}
 
 
 def act_park(data, body):
@@ -139,13 +194,14 @@ def act_note(data, body):
 
 ACTIONS = {
     "/api/resume": act_resume,
+    "/api/open": act_open,
     "/api/park": act_park,
     "/api/move": act_move,
     "/api/archive": act_archive,
     "/api/note": act_note,
 }
 # Reading the store is enough for resume; the rest mutate and must be persisted.
-READ_ONLY = {"/api/resume"}
+READ_ONLY = {"/api/resume", "/api/open"}
 
 
 class Handler(BaseHTTPRequestHandler):
