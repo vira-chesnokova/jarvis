@@ -1,0 +1,10 @@
+# Optional Codex / ChatGPT desktop metadata. Ignored by Claude Code.
+interface:
+  display_name: "Jarvis"
+  short_description: "Sweeps your open tabs, files them against your projects, keeps a live dashboard."
+  brand_color: "#3D6B5C"
+
+policy:
+  # Jarvis closes browser tabs. That should happen because you asked for it,
+  # not because a prompt happened to sound tab-adjacent.
+  allow_implicit_invocation: false

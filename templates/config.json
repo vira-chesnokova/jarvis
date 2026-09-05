@@ -1,0 +1,28 @@
+{
+  "_comment": "Machine-enforced rules only. The human context lives in profile.md.",
+
+  "browser_app": "Google Chrome",
+  "_browser_app_note": "Exact macOS app name. Jarvis talks to it only if it is ALREADY running - it never launches a browser. Run `read_tabs.py --which` to see what's open. Also valid: Google Chrome Beta, Google Chrome Canary, Chromium, Brave Browser, Microsoft Edge, Arc, Vivaldi.",
+
+  "protect": [
+    "localhost",
+    "127.0.0.1"
+  ],
+  "_protect_note": "Substring match on the URL. These are never closed, whatever the agent concludes. Add your mail, calendar, chat, and anything you keep open as a matter of habit - e.g. \"mail.google.com\", \"app.slack.com\", \"github.com/pulls\". Unsaved-state tabs are also protected, but by judgment rather than pattern.",
+
+  "autonomous": true,
+  "_autonomous_note": "true: reading tabs are filed and closed without asking. false: Jarvis lists what it would close and waits for you. Nothing is ever lost either way - every tab is written to jarvis.json before it is closed.",
+
+  "port": 7777,
+  "_port_note": "Local dashboard port, bound to 127.0.0.1 only. Change it if something else owns 7777.",
+
+  "knowledge": {
+    "github": "",
+    "_github_note": "Optional. A knowledge-base repo URL, e.g. https://github.com/you/notes - Jarvis reads its README to learn your vocabulary.",
+
+    "folders": [],
+    "_folders_note": "Optional. Absolute paths Jarvis may skim to learn your project vocabulary, e.g. [\"/Users/you/notes\", \"/Users/you/work/docs\"]. It reads titles and READMEs, not whole files."
+  },
+
+  "dashboard_opens_automatically": true
+}
