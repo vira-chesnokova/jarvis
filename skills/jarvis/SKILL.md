@@ -43,9 +43,19 @@ an append-only list of corrections they've made.
 - **How I work** holds their stated preferences. Follow them even where you'd
   choose differently.
 
-If "Current projects" still says _Not filled in yet_, read `onboarding.md` in this
-skill directory and follow it instead of the pipeline below. Do the same if they
-say "set up jarvis", "redo my profile", or `/jarvis setup`.
+If "Current projects" still says _Not filled in yet_ — or `profile.md` doesn't
+exist — **read `onboarding.md` from this skill's directory right now and carry out
+its Message 1 in this same turn.** Do the same if they say "set up jarvis", "redo
+my profile", or `/jarvis setup`.
+
+Do not announce that onboarding is needed and stop. Do not ask whether to begin.
+Saying "I need to onboard you first" and ending the turn is a failure: read the
+file and start. The tone rule below does not apply during onboarding — that
+conversation is supposed to be a conversation.
+
+If `onboarding.md` is missing from the skill directory, don't stop either. Ask the
+two questions inline: *what are you accountable for?* and *what are the 3–5 things
+actually on your plate?* — then write the profile from the answers.
 
 ### The three buckets
 

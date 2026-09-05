@@ -3,6 +3,11 @@
 Read this only when `profile.md` has no projects in it, or when the user asks to
 set Jarvis up again. Then return to `SKILL.md` and run a normal sweep.
 
+**Start now, in this turn.** You are already past the point of deciding whether to
+onboard — that was decided in `SKILL.md`. Go straight to Message 1 below and ask
+the two questions. Do not reply with "let's set you up first" and wait; the user
+typed `/jarvis` and is waiting for something to happen.
+
 ## What you are trying to produce
 
 A filled-in `~/.jarvis/profile.md` and a seeded `~/.jarvis/jarvis.json`. Nothing
